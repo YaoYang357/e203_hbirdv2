@@ -1,0 +1,152 @@
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|sirv_debug_module:u_sirv_debug_module|sirv_jtag_dtm:jtag_dtm_gen.u_sirv_jtag_dtm|jtagStateReg
+Name jtagStateReg.UPDATE_IR jtagStateReg.EXIT2_IR jtagStateReg.PAUSE_IR jtagStateReg.EXIT1_IR jtagStateReg.SHIFT_IR jtagStateReg.CAPTURE_IR jtagStateReg.SELECT_IR jtagStateReg.UPDATE_DR jtagStateReg.EXIT2_DR jtagStateReg.PAUSE_DR jtagStateReg.EXIT1_DR jtagStateReg.SHIFT_DR jtagStateReg.CAPTURE_DR jtagStateReg.SELECT_DR jtagStateReg.RUN_TEST_IDLE jtagStateReg.TEST_LOGIC_RESET 
+jtagStateReg.TEST_LOGIC_RESET 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+jtagStateReg.RUN_TEST_IDLE 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+jtagStateReg.SELECT_DR 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 
+jtagStateReg.CAPTURE_DR 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 
+jtagStateReg.SHIFT_DR 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+jtagStateReg.EXIT1_DR 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 
+jtagStateReg.PAUSE_DR 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 
+jtagStateReg.EXIT2_DR 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+jtagStateReg.UPDATE_DR 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 
+jtagStateReg.SELECT_IR 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 
+jtagStateReg.CAPTURE_IR 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 1 
+jtagStateReg.SHIFT_IR 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 1 
+jtagStateReg.EXIT1_IR 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 
+jtagStateReg.PAUSE_IR 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 
+jtagStateReg.EXIT2_IR 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+jtagStateReg.UPDATE_IR 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_i2c:u_perips_apb_i2c1|i2c_master_byte_ctrl:byte_controller|c_state
+Name c_state.ST_IDLE c_state.ST_STOP c_state.ST_ACK c_state.ST_WRITE c_state.ST_READ c_state.ST_START 
+c_state.ST_IDLE 0 0 0 0 0 0 
+c_state.ST_START 1 0 0 0 0 1 
+c_state.ST_READ 1 0 0 0 1 0 
+c_state.ST_WRITE 1 0 0 1 0 0 
+c_state.ST_ACK 1 0 1 0 0 0 
+c_state.ST_STOP 1 1 0 0 0 0 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_i2c:u_perips_apb_i2c0|i2c_master_byte_ctrl:byte_controller|c_state
+Name c_state.ST_IDLE c_state.ST_STOP c_state.ST_ACK c_state.ST_WRITE c_state.ST_READ c_state.ST_START 
+c_state.ST_IDLE 0 0 0 0 0 0 
+c_state.ST_START 1 0 0 0 0 1 
+c_state.ST_READ 1 0 0 0 1 0 
+c_state.ST_WRITE 1 0 0 1 0 0 
+c_state.ST_ACK 1 0 1 0 0 0 
+c_state.ST_STOP 1 1 0 0 0 0 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_spi_master:u_perips_apb_spi2|spi_master_controller:u_spictrl|state
+Name state.WAIT_EDGE state.DATA_RX state.DATA_TX state.DUMMY state.MODE state.ADDR state.CMD state.IDLE 
+state.IDLE 0 0 0 0 0 0 0 0 
+state.CMD 0 0 0 0 0 0 1 1 
+state.ADDR 0 0 0 0 0 1 0 1 
+state.MODE 0 0 0 0 1 0 0 1 
+state.DUMMY 0 0 0 1 0 0 0 1 
+state.DATA_TX 0 0 1 0 0 0 0 1 
+state.DATA_RX 0 1 0 0 0 0 0 1 
+state.WAIT_EDGE 1 0 0 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_spi_master:u_perips_apb_spi2|spi_master_controller:u_spictrl|spi_master_rx:u_rxreg|rx_CS
+Name rx_CS.WAIT_FIFO_DONE rx_CS.WAIT_FIFO rx_CS.RECEIVE rx_CS.IDLE 
+rx_CS.IDLE 0 0 0 0 
+rx_CS.RECEIVE 0 0 1 1 
+rx_CS.WAIT_FIFO 0 1 0 1 
+rx_CS.WAIT_FIFO_DONE 1 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_spi_master:u_perips_apb_spi2|spi_master_controller:u_spictrl|spi_master_tx:u_txreg|tx_CS
+Name tx_CS.TRANSMIT 
+tx_CS.IDLE 0 
+tx_CS.TRANSMIT 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_spi_master:u_perips_apb_spi1|spi_master_controller:u_spictrl|state
+Name state.WAIT_EDGE state.DATA_RX state.DATA_TX state.DUMMY state.MODE state.ADDR state.CMD state.IDLE 
+state.IDLE 0 0 0 0 0 0 0 0 
+state.CMD 0 0 0 0 0 0 1 1 
+state.ADDR 0 0 0 0 0 1 0 1 
+state.MODE 0 0 0 0 1 0 0 1 
+state.DUMMY 0 0 0 1 0 0 0 1 
+state.DATA_TX 0 0 1 0 0 0 0 1 
+state.DATA_RX 0 1 0 0 0 0 0 1 
+state.WAIT_EDGE 1 0 0 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_spi_master:u_perips_apb_spi1|spi_master_controller:u_spictrl|spi_master_rx:u_rxreg|rx_CS
+Name rx_CS.WAIT_FIFO_DONE rx_CS.WAIT_FIFO rx_CS.RECEIVE rx_CS.IDLE 
+rx_CS.IDLE 0 0 0 0 
+rx_CS.RECEIVE 0 0 1 1 
+rx_CS.WAIT_FIFO 0 1 0 1 
+rx_CS.WAIT_FIFO_DONE 1 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_spi_master:u_perips_apb_spi1|spi_master_controller:u_spictrl|spi_master_tx:u_txreg|tx_CS
+Name tx_CS.TRANSMIT 
+tx_CS.IDLE 0 
+tx_CS.TRANSMIT 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_uart_sv:u_perips_apb_uart2|uart_tx:uart_tx_i|CS
+Name CS.STOP_BIT_LAST CS.STOP_BIT_FIRST CS.PARITY CS.DATA CS.START_BIT CS.IDLE 
+CS.IDLE 0 0 0 0 0 0 
+CS.START_BIT 0 0 0 0 1 1 
+CS.DATA 0 0 0 1 0 1 
+CS.PARITY 0 0 1 0 0 1 
+CS.STOP_BIT_FIRST 0 1 0 0 0 1 
+CS.STOP_BIT_LAST 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_uart_sv:u_perips_apb_uart2|uart_rx:uart_rx_i|CS
+Name CS.STOP_BIT CS.PARITY CS.SAVE_DATA CS.DATA CS.START_BIT CS.IDLE 
+CS.IDLE 0 0 0 0 0 0 
+CS.START_BIT 0 0 0 0 1 1 
+CS.DATA 0 0 0 1 0 1 
+CS.SAVE_DATA 0 0 1 0 0 1 
+CS.PARITY 0 1 0 0 0 1 
+CS.STOP_BIT 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_uart_sv:u_perips_apb_uart1|uart_tx:uart_tx_i|CS
+Name CS.STOP_BIT_LAST CS.STOP_BIT_FIRST CS.PARITY CS.DATA CS.START_BIT CS.IDLE 
+CS.IDLE 0 0 0 0 0 0 
+CS.START_BIT 0 0 0 0 1 1 
+CS.DATA 0 0 0 1 0 1 
+CS.PARITY 0 0 1 0 0 1 
+CS.STOP_BIT_FIRST 0 1 0 0 0 1 
+CS.STOP_BIT_LAST 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_uart_sv:u_perips_apb_uart1|uart_rx:uart_rx_i|CS
+Name CS.STOP_BIT CS.PARITY CS.SAVE_DATA CS.DATA CS.START_BIT CS.IDLE 
+CS.IDLE 0 0 0 0 0 0 
+CS.START_BIT 0 0 0 0 1 1 
+CS.DATA 0 0 0 1 0 1 
+CS.SAVE_DATA 0 0 1 0 0 1 
+CS.PARITY 0 1 0 0 0 1 
+CS.STOP_BIT 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_uart_sv:u_perips_apb_uart0|uart_tx:uart_tx_i|CS
+Name CS.STOP_BIT_LAST CS.STOP_BIT_FIRST CS.PARITY CS.DATA CS.START_BIT CS.IDLE 
+CS.IDLE 0 0 0 0 0 0 
+CS.START_BIT 0 0 0 0 1 1 
+CS.DATA 0 0 0 1 0 1 
+CS.PARITY 0 0 1 0 0 1 
+CS.STOP_BIT_FIRST 0 1 0 0 0 1 
+CS.STOP_BIT_LAST 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|apb_uart_sv:u_perips_apb_uart0|uart_rx:uart_rx_i|CS
+Name CS.STOP_BIT CS.PARITY CS.SAVE_DATA CS.DATA CS.START_BIT CS.IDLE 
+CS.IDLE 0 0 0 0 0 0 
+CS.START_BIT 0 0 0 0 1 1 
+CS.DATA 0 0 0 1 0 1 
+CS.SAVE_DATA 0 0 1 0 0 1 
+CS.PARITY 0 1 0 0 0 1 
+CS.STOP_BIT 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|sirv_flash_qspi_top:u_sirv_qspi0_top|sirv_flash_qspi:u_sirv_flash_qspi|sirv_qspi_flashmap:flash|state
+Name state.101 state.100 state.011 state.010 state.001 state.000 
+state.000 0 0 0 0 0 0 
+state.001 0 0 0 0 1 1 
+state.010 0 0 0 1 0 1 
+state.011 0 0 1 0 0 1 
+state.100 0 1 0 0 0 1 
+state.101 1 0 0 0 0 1 
+
+State Machine - |e203_soc_top|e203_subsys_top:u_e203_subsys_top|e203_subsys_main:u_e203_subsys_main|e203_subsys_perips:u_e203_subsys_perips|sirv_flash_qspi_top:u_sirv_qspi0_top|sirv_flash_qspi:u_sirv_flash_qspi|sirv_qspi_media:mac|state
+Name state.00 state.10 state.01 
+state.00 0 0 0 
+state.01 1 0 1 
+state.10 1 1 0 

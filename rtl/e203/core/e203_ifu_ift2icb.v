@@ -1,25 +1,4 @@
- /*                                                                      
- Copyright 2018-2020 Nuclei System Technology, Inc.                
-                                                                         
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-                                                                         
-     http://www.apache.org/licenses/LICENSE-2.0                          
-                                                                         
-  Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */                                                                      
-                                                                         
-                                                                         
-                                                                         
 //=====================================================================
-//
-// Designer   : Bob Hu
-//
 // Description:
 //  The ift2icb module convert the fetch request to ICB (Internal Chip bus) 
 //  and dispatch to different targets including ITCM, ICache or Sys-MEM.
@@ -223,7 +202,7 @@ module e203_ifu_ift2icb(
 //       16bits length (until after it read-back and decoded by mini-decoder).
 //       When the new fetch is crossing lane-boundry from current lane
 //       to next lane, and if the current lane read-out value is holding up.
-//       Then new 32bits instruction to be fetched can be concatated by 
+//       Then new 32bits instruction to be fetched can be concatated by // concatated应该是拼写错误，实为concatenate
 //       "current holding-up lane's upper 16bits" and "next lane's lower 16bits".
 //       To make it in one cycle, we push the "current holding-up lane's 
 //       upper 16bits" into leftover buffer (16bits) and only issue one ifetch

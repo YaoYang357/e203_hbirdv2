@@ -1,0 +1,1 @@
+Info (10281): Verilog HDL Declaration information at uart_rx.v(32): object "START_BIT" differs only in case from object "start_bit" in the same scope File: C:/Users/Dell/Desktop/e203_hbirdv2/Project/rtl/perips/apb_uart/uart_rx.v Line: 32

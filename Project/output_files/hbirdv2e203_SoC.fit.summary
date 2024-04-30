@@ -1,0 +1,16 @@
+Fitter Status : Failed - Fri Apr 26 14:35:42 2024
+Quartus Prime Version : 18.1.0 Build 625 09/12/2018 SJ Standard Edition
+Revision Name : hbirdv2e203_SoC
+Top-level Entity Name : e203_soc_top
+Family : Cyclone IV E
+Device : EP4CE10F17C8
+Timing Models : Final
+Total logic elements : 26,582 / 10,320 ( 258 % )
+    Total combinational functions : 19,330 / 10,320 ( 187 % )
+    Dedicated logic registers : 11,550 / 10,320 ( 112 % )
+Total registers : 11550
+Total pins : 223 / 180 ( 124 % )
+Total virtual pins : 0
+Total memory bits : 1,048,576 / 423,936 ( 247 % )
+Embedded Multiplier 9-bit elements : 0 / 46 ( 0 % )
+Total PLLs : 0 / 2 ( 0 % )
