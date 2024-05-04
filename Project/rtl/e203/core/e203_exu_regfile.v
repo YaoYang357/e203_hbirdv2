@@ -1,24 +1,4 @@
- /*                                                                      
- Copyright 2018-2020 Nuclei System Technology, Inc.                
-                                                                         
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-                                                                         
-     http://www.apache.org/licenses/LICENSE-2.0                          
-                                                                         
-  Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */                                                                      
-                                                                         
-                                                                         
-                                                                         
 //=====================================================================
-// Designer   : Bob Hu
-//
 // Description:
 //  The Regfile module to implement the core's general purpose registers file
 //
@@ -54,7 +34,7 @@ module e203_exu_regfile(
 
   
   genvar i;
-  generate //{
+  generate //{// 通过使用参数化的generate语法生成通用寄存器组的逻辑
   
       for (i=0; i<`E203_RFREG_NUM; i=i+1) begin:regfile//{
   
@@ -67,8 +47,9 @@ module e203_exu_regfile(
           `endif//}
         end
         else begin: rfno0
+            // 通过对结果寄存器的索引号和寄存器号进行比较产生写使能信号
             assign rf_wen[i] = wbck_dest_wen & (wbck_dest_idx == i) ;
-          `ifdef E203_REGFILE_LATCH_BASED //{
+          `ifdef E203_REGFILE_LATCH_BASED //{// 如果使用锁存器的配置，则为每一个通用寄存器配置一个门控时钟以降低功耗
             e203_clkgate u_e203_clkgate(
               .clk_in  (clk  ),
               .test_mode(test_mode),

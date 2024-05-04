@@ -1,25 +1,4 @@
- /*                                                                      
- Copyright 2018-2020 Nuclei System Technology, Inc.                
-                                                                         
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-                                                                         
-     http://www.apache.org/licenses/LICENSE-2.0                          
-                                                                         
-  Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */                                                                      
-                                                                         
-                                                                         
-                                                                         
 //=====================================================================
-//
-// Designer   : Bob Hu
-//
 // Description:
 //  The module to implement the core's CSRs
 //
@@ -32,10 +11,10 @@ module e203_exu_csr(
   output nice_xs_off,
 `endif
 
-  input csr_ena,
-  input csr_wr_en,
-  input csr_rd_en,
-  input [12-1:0] csr_idx,
+  input csr_ena, // 来自ALU的CSR读写使能信号
+  input csr_wr_en, // CSR写操作指示信号
+  input csr_rd_en, // CSR读操作指示信号
+  input [12-1:0] csr_idx, // CSR的地址索引
 
   output csr_access_ilgl,
   output tm_stop,
@@ -293,11 +272,11 @@ wire [`E203_XLEN-1:0] csr_mip = ip_r;
 //0x005 URW utvec User trap handler base address.
 //  We dont support user trap, so no utvec needed
 //0x305 MRW mtvec Machine trap-handler base address.
-wire sel_mtvec = (csr_idx == 12'h305);
+wire sel_mtvec = (csr_idx == 12'h305); // 对CSR索引进行译码判断以判断是否选中mtvec寄存器
 wire rd_mtvec = csr_rd_en & sel_mtvec;
 `ifdef E203_SUPPORT_MTVEC //{
 wire wr_mtvec = sel_mtvec & csr_wr_en;
-wire mtvec_ena = (wr_mtvec & wbck_csr_wen);
+wire mtvec_ena = (wr_mtvec & wbck_csr_wen);// 产生mtvec寄存器使能信号
 wire [`E203_XLEN-1:0] mtvec_r;
 wire [`E203_XLEN-1:0] mtvec_nxt = wbck_csr_dat;
 sirv_gnrl_dfflr #(`E203_XLEN) mtvec_dfflr (mtvec_ena, mtvec_nxt, mtvec_r, clk, rst_n);

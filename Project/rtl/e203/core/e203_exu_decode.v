@@ -11,7 +11,7 @@ module e203_exu_decode(
   // The IR stage to Decoder，以下为从IFU输入译码模块的信号
   input  [`E203_INSTR_SIZE-1:0] i_instr, // 来自IFU的32位指令
   input  [`E203_PC_SIZE-1:0] i_pc,       // 来自IFU的当前指令对应PC值
-  input  i_prdt_taken, 
+  input  i_prdt_taken,           // 指令预取？
   input  i_misalgn,              // The fetch misalign，表明当前指令出现了取值未对齐异常
   input  i_buserr,               // The fetch bus error，表明当前指令出现了取指存储器访问错误
   input  i_muldiv_b2b,           // The back2back case for mul/div
@@ -64,7 +64,7 @@ module e203_exu_decode(
 
 
   wire [32-1:0] rv32_instr = i_instr;
-  wire [16-1:0] rv16_instr = i_instr[15:0]; // 32位智只取低16位
+  wire [16-1:0] rv16_instr = i_instr[15:0]; // 32位只取低16位
 
   wire [6:0]  opcode = rv32_instr[6:0];
 
@@ -73,7 +73,7 @@ module e203_exu_decode(
   wire opcode_1_0_10  = (opcode[1:0] == 2'b10);
   wire opcode_1_0_11  = (opcode[1:0] == 2'b11);
 
-  wire rv32 = (~(i_instr[4:2] == 3'b111)) & opcode_1_0_11; // p103，32位指令的[4:2]绝不为111；16位指令的[1:0]绝不为11
+  wire rv32 = (~(i_instr[4:2] == 3'b111)) & opcode_1_0_11; // p103，32位指令的[4:2]绝不为111、16位指令的[1:0]绝不为11；且指令的前两位为11
 
 // 取出32位指令的关键编码段
   wire [4:0]  rv32_rd     = rv32_instr[11:7];
@@ -95,6 +95,7 @@ module e203_exu_decode(
 
   
   // We generate the signals and reused them as much as possible to save gatecounts
+  // 这里的关键是，在一开始就对各字段的码值做了判断并引出信号，后面不用重复判断，节省了比较器资源
   wire opcode_4_2_000 = (opcode[4:2] == 3'b000);
   wire opcode_4_2_001 = (opcode[4:2] == 3'b001);
   wire opcode_4_2_010 = (opcode[4:2] == 3'b010);
@@ -675,6 +676,9 @@ module e203_exu_decode(
                  )
                  );
 
+// 译码出指令的立即数，不同的指令类型有不同的立即数编码形式，需要译码
+// 首先，译码32位指令的不同立即数格式
+
   wire [31:0]  rv32_i_imm = { 
                                {20{rv32_instr[31]}} 
                               , rv32_instr[31:20]
@@ -743,6 +747,9 @@ module e203_exu_decode(
   
                    // It will select CIS-type immediate when
                    //    * rv16_lwsp
+
+// 其次，译码16位指令的不同立即数格式
+
   wire rv16_imm_sel_cis = rv16_lwsp;
   wire [31:0]  rv16_cis_imm ={
                           24'b0
@@ -913,6 +920,9 @@ module e203_exu_decode(
                    
   wire [31:0]  rv32_load_fp_imm  = rv32_i_imm;
   wire [31:0]  rv32_store_fp_imm = rv32_s_imm;
+
+// 以下逻辑是典型的5输入并行多路选择器，根据32位立即数的类型，选择生成32位指令最终的立即数
+
   wire [31:0]  rv32_imm = 
                      ({32{rv32_imm_sel_i}} & rv32_i_imm)
                    | ({32{rv32_imm_sel_s}} & rv32_s_imm)
@@ -928,6 +938,8 @@ module e203_exu_decode(
                    | rv32_imm_sel_u
                    | rv32_imm_sel_j
                    ;
+
+// 以下逻辑是典型的10输入并行多路选择器，根据16位立即数的类型，选择生成16位指令最终的立即数
 
   wire [31:0]  rv16_imm = 
                      ({32{rv16_imm_sel_cis   }} & rv16_cis_imm)
@@ -955,14 +967,14 @@ module e203_exu_decode(
                    | rv16_imm_sel_cj    
                    ;
 
-
+// 根据指令是16位还是32位指令，选择生成最终的立即数
   assign need_imm = rv32 ? rv32_need_imm : rv16_need_imm; 
 
   assign dec_imm = rv32 ? rv32_imm : rv16_imm;
   assign dec_pc  = i_pc;
 
   
-
+// 以下逻辑是典型的5输入并行多路选择器，选择信号是指令类型信号，从而根据不同的指令分组，将它们的信息总线经过并行多路选择的方式复用到统一的输出信号dec_info上
   assign dec_info = 
               ({`E203_DECINFO_WIDTH{alu_op}}     & {{`E203_DECINFO_WIDTH-`E203_DECINFO_ALU_WIDTH{1'b0}},alu_info_bus})
             | ({`E203_DECINFO_WIDTH{amoldst_op}} & {{`E203_DECINFO_WIDTH-`E203_DECINFO_AGU_WIDTH{1'b0}},agu_info_bus})
@@ -1140,10 +1152,10 @@ module e203_exu_decode(
        | ({`E203_RFIDX_WIDTH{rv16_need_cj_rdd}}  & rv16_cj_rdd)
        ;
 
+// 根据指令是16位还是32位指令，选择生成最终的操作数寄存器索引
   assign dec_rs1idx = rv32 ? rv32_rs1[`E203_RFIDX_WIDTH-1:0] : rv16_rs1idx;
   assign dec_rs2idx = rv32 ? rv32_rs2[`E203_RFIDX_WIDTH-1:0] : rv16_rs2idx;
   assign dec_rdidx  = rv32 ? rv32_rd [`E203_RFIDX_WIDTH-1:0] : rv16_rdidx ;
-
 
   assign dec_rs1en = rv32 ? rv32_need_rs1 : (rv16_rs1en & (~(rv16_rs1idx == `E203_RFIDX_WIDTH'b0))); 
   assign dec_rs2en = rv32 ? rv32_need_rs2 : (rv16_rs2en & (~(rv16_rs2idx == `E203_RFIDX_WIDTH'b0)));
