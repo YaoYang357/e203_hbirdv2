@@ -8,32 +8,32 @@
 module e203_exu_decode(
 
   //////////////////////////////////////////////////////////////
-  // The IR stage to Decoder
-  input  [`E203_INSTR_SIZE-1:0] i_instr,
-  input  [`E203_PC_SIZE-1:0] i_pc,
+  // The IR stage to Decoder，以下为从IFU输入译码模块的信号
+  input  [`E203_INSTR_SIZE-1:0] i_instr, // 来自IFU的32位指令
+  input  [`E203_PC_SIZE-1:0] i_pc,       // 来自IFU的当前指令对应PC值
   input  i_prdt_taken, 
-  input  i_misalgn,              // The fetch misalign
-  input  i_buserr,               // The fetch bus error
+  input  i_misalgn,              // The fetch misalign，表明当前指令出现了取值未对齐异常
+  input  i_buserr,               // The fetch bus error，表明当前指令出现了取指存储器访问错误
   input  i_muldiv_b2b,           // The back2back case for mul/div
 
   input  dbg_mode,
   //////////////////////////////////////////////////////////////
-  // The Decoded Info-Bus
+  // The Decoded Info-Bus，以下为对指令进行译码得到的信息
 
-  output dec_rs1x0,
-  output dec_rs2x0,
-  output dec_rs1en,
-  output dec_rs2en,
-  output dec_rdwen,
-  output [`E203_RFIDX_WIDTH-1:0] dec_rs1idx,
+  output dec_rs1x0, // 该指令的源操作数1的寄存器索引为x0
+  output dec_rs2x0, // 该指令的源操作数2的寄存器索引为x0
+  output dec_rs1en, // 该指令需要读取源操作数1
+  output dec_rs2en, // 该指令需要读取源操作数2
+  output dec_rdwen, // 该指令需要写结果操作数，rd write enable
+  output [`E203_RFIDX_WIDTH-1:0] dec_rs1idx, // regfile index width of rs1
   output [`E203_RFIDX_WIDTH-1:0] dec_rs2idx,
   output [`E203_RFIDX_WIDTH-1:0] dec_rdidx,
-  output [`E203_DECINFO_WIDTH-1:0] dec_info,  
-  output [`E203_XLEN-1:0] dec_imm,
+  output [`E203_DECINFO_WIDTH-1:0] dec_info,  // 该指令的其他信息，将其打包为一组宽信号，称为信息总线
+  output [`E203_XLEN-1:0] dec_imm, // 该指令使用的立即数值
   output [`E203_PC_SIZE-1:0] dec_pc,
   output dec_misalgn,
   output dec_buserr,
-  output dec_ilegl,
+  output dec_ilegl, // 经过译码后，发现本指令是非法指令
 
   `ifdef E203_HAS_NICE//{
   //////////////////////////////////////
@@ -44,7 +44,7 @@ module e203_exu_decode(
   /////////////////////////////////////
   `endif//}
 
-  output dec_mulhsu,
+  output dec_mulhsu, // Half Signed, Unsigned
   output dec_mul   ,
   output dec_div   ,
   output dec_rem   ,
@@ -64,23 +64,25 @@ module e203_exu_decode(
 
 
   wire [32-1:0] rv32_instr = i_instr;
-  wire [16-1:0] rv16_instr = i_instr[15:0];
+  wire [16-1:0] rv16_instr = i_instr[15:0]; // 32位智只取低16位
 
   wire [6:0]  opcode = rv32_instr[6:0];
 
-  wire opcode_1_0_00  = (opcode[1:0] == 2'b00);
+  wire opcode_1_0_00  = (opcode[1:0] == 2'b00); // opcode[1:0] 为2'b00
   wire opcode_1_0_01  = (opcode[1:0] == 2'b01);
   wire opcode_1_0_10  = (opcode[1:0] == 2'b10);
   wire opcode_1_0_11  = (opcode[1:0] == 2'b11);
 
-  wire rv32 = (~(i_instr[4:2] == 3'b111)) & opcode_1_0_11;
+  wire rv32 = (~(i_instr[4:2] == 3'b111)) & opcode_1_0_11; // p103，32位指令的[4:2]绝不为111；16位指令的[1:0]绝不为11
 
+// 取出32位指令的关键编码段
   wire [4:0]  rv32_rd     = rv32_instr[11:7];
   wire [2:0]  rv32_func3  = rv32_instr[14:12];
   wire [4:0]  rv32_rs1    = rv32_instr[19:15];
   wire [4:0]  rv32_rs2    = rv32_instr[24:20];
   wire [6:0]  rv32_func7  = rv32_instr[31:25];
 
+// 同理，取出16位指令的关键编码段
   wire [4:0]  rv16_rd     = rv32_rd;
   wire [4:0]  rv16_rs1    = rv16_rd; 
   wire [4:0]  rv16_rs2    = rv32_instr[6:2];
@@ -226,7 +228,7 @@ module e203_exu_decode(
   wire rv16_jalr_mv_add  = opcode_1_0_10 & rv16_func3_100;//--
   wire rv16_swsp         = opcode_1_0_10 & rv16_func3_110;//
 
-  `ifndef E203_HAS_FPU//{
+  `ifndef E203_HAS_FPU//{ 目前还没有浮点运算单元
   wire rv16_flw          = 1'b0;
   wire rv16_fld          = 1'b0;
   wire rv16_fsw          = 1'b0;
@@ -1193,7 +1195,7 @@ module e203_exu_decode(
   assign dec_misalgn = i_misalgn;
   assign dec_buserr  = i_buserr ;
 
-
+// 译出不同的非法指令情形
   assign dec_ilegl = 
             (rv_all0s1s_ilgl) 
           | (rv_index_ilgl) 
