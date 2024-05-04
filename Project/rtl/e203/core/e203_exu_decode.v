@@ -1,7 +1,4 @@
 //=====================================================================
-//
-// Designer   : Bob Hu
-//
 // Description:
 //  The decode module to decode the instruction details
 //
