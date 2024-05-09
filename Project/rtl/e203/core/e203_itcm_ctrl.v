@@ -113,7 +113,7 @@ module e203_itcm_ctrl(
   wire lsu_icb_rsp_err;
   wire [`E203_ITCM_DATA_WIDTH-1:0] lsu_icb_rsp_rdata; 
 
-  sirv_gnrl_icb_n2w # (
+  sirv_gnrl_icb_n2w # ( // narrow to wide
   .FIFO_OUTS_NUM   (`E203_ITCM_OUTS_NUM),
   .FIFO_CUT_READY  (0),
   .USR_W      (1),
