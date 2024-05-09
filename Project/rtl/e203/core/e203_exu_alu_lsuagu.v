@@ -1,21 +1,3 @@
- /*                                                                      
- Copyright 2018-2020 Nuclei System Technology, Inc.                
-                                                                         
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-                                                                         
-     http://www.apache.org/licenses/LICENSE-2.0                          
-                                                                         
-  Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */                                                                      
-                                                                         
-                                                                         
-                                                                         
 //=====================================================================
 //
 // Designer   : Bob Hu
@@ -25,7 +7,7 @@
 //  and AMO instructions), which is mostly share the datapath with ALU module
 //  to save gatecount to mininum
 //
-//
+//  其主要实现了相关的控制和选择，并没有实际使用加法器
 // ====================================================================
 `include "e203_defines.v"
 
@@ -101,6 +83,7 @@ module e203_exu_alu_lsuagu(
   //   it wasted the area for no points 
   // 
      // The operands and info to ALU
+     // 输出加法操作所需的操作数和运算类型，ALU的共享数据通路模块中将实际使用这几个信号进行加法运算
   output [`E203_XLEN-1:0] agu_req_alu_op1,
   output [`E203_XLEN-1:0] agu_req_alu_op2,
   output agu_req_alu_swap,
@@ -112,6 +95,7 @@ module e203_exu_alu_lsuagu(
   output agu_req_alu_min ,
   output agu_req_alu_maxu,
   output agu_req_alu_minu,
+    // 输入来自ALU的共享数据通路模块中加法器的运算结果
   input  [`E203_XLEN-1:0] agu_req_alu_res,
 
      // The Shared-Buffer interface to ALU-Shared-Buffer
@@ -616,7 +600,9 @@ module e203_exu_alu_lsuagu(
                        | (agu_i_unalgnldst) //& agu_i_excl) We dont support unaligned load/store regardless it is AMO or not
                        )
                        ;
+  // 为交付接口产生Load指令指示信号，用于产生读存储器地址不对齐异常
   assign agu_o_cmt_ld      = agu_i_load & (~agu_i_excl); 
+  // 为交付接口产生Store和AMO指令指示信号，用于产生写存储器或AMO地址不对齐异常
   assign agu_o_cmt_stamo   = agu_i_store | agu_i_amo | agu_i_excl;
 
   

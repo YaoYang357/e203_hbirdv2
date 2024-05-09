@@ -1,21 +1,3 @@
- /*                                                                      
- Copyright 2018-2020 Nuclei System Technology, Inc.                
-                                                                         
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-                                                                         
-     http://www.apache.org/licenses/LICENSE-2.0                          
-                                                                         
-  Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */                                                                      
-                                                                         
-                                                                         
-                                                                         
 //=====================================================================
 //
 // Designer   : Bob Hu
@@ -178,8 +160,9 @@ module e203_exu_alu(
 
   //////////////////////////////////////////////////////////////
   // Dispatch to different sub-modules according to their types
-
+  // 将发生异常的指令单独列为一种类型，这些指令无需被具体的执行单元执行
   wire ifu_excp_op = i_ilegl | i_buserr | i_misalgn;
+  // 通过译码模块生成的分组信息（包含在信息总线中）进行判断，判断出需要什么单元执行指令
   wire alu_op = (~ifu_excp_op) & (i_info[`E203_DECINFO_GRP] == `E203_DECINFO_GRP_ALU); 
   wire agu_op = (~ifu_excp_op) & (i_info[`E203_DECINFO_GRP] == `E203_DECINFO_GRP_AGU); 
   wire bjp_op = (~ifu_excp_op) & (i_info[`E203_DECINFO_GRP] == `E203_DECINFO_GRP_BJP); 
@@ -197,6 +180,7 @@ module e203_exu_alu(
   //   * The AGU if it is a load/store relevant instructions
   //   * The MULDIV if it is a MUL/DIV relevant instructions and MULDIV
   //       is reusing the ALU adder
+  // 根据不同的指分组指示信号，将对应子单元的输入valid信号置1，并且选择对应子单元的ready信号作为反馈给上游派遣模块的ready握手信号，通过此方式实现指令的派遣
 `ifdef E203_SUPPORT_SHARE_MULDIV //{
   wire mdv_i_valid = i_valid & mdv_op;
 `endif//E203_SUPPORT_SHARE_MULDIV}
@@ -217,7 +201,7 @@ module e203_exu_alu(
   wire bjp_i_ready;
   wire csr_i_ready;
   wire ifu_excp_i_ready;
-
+// 选择对应子单元的ready信号作为反馈给上游派遣模块的ready握手信号。本质上该逻辑是使用And-Or方式实现的并行多路选择器
   assign i_ready =   (agu_i_ready & agu_op)
                    `ifdef E203_SUPPORT_SHARE_MULDIV //{
                    | (mdv_i_ready & mdv_op)
@@ -256,7 +240,7 @@ module e203_exu_alu(
   wire csr_o_ready;
   wire [`E203_XLEN-1:0] csr_o_wbck_wdat;
   wire csr_o_wbck_err;
-
+// 为了降低动态功耗，采用逻辑门控的方式，增加一级“与”门，对于子单元输入信号与分组指示信号进行“与”操作，因此在无需使用该子单元之时，其输入信号就都是0，从而降低动态功耗
   wire  [`E203_XLEN-1:0]           csr_i_rs1   = {`E203_XLEN         {csr_op}} & i_rs1;
   wire  [`E203_XLEN-1:0]           csr_i_rs2   = {`E203_XLEN         {csr_op}} & i_rs2;
   wire  [`E203_XLEN-1:0]           csr_i_imm   = {`E203_XLEN         {csr_op}} & i_imm;

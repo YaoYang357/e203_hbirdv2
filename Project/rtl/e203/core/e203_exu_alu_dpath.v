@@ -1,21 +1,3 @@
- /*                                                                      
- Copyright 2018-2020 Nuclei System Technology, Inc.                
-                                                                         
- Licensed under the Apache License, Version 2.0 (the "License");         
- you may not use this file except in compliance with the License.        
- You may obtain a copy of the License at                                 
-                                                                         
-     http://www.apache.org/licenses/LICENSE-2.0                          
-                                                                         
-  Unless required by applicable law or agreed to in writing, software    
- distributed under the License is distributed on an "AS IS" BASIS,       
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and     
- limitations under the License.                                          
- */                                                                      
-                                                                         
-                                                                         
-                                                                         
 //=====================================================================
 //
 // Designer   : Bob Hu
@@ -206,7 +188,7 @@ module e203_exu_alu_dpath(
 
   wire [`E203_XLEN-1:0] sll_res = shifter_res;
   wire [`E203_XLEN-1:0] srl_res =  
-                 {
+                 {// 实际上，这一步没有在代码中实现左移到右移的转换，而是在物理层面重新映射输出位的顺序
     shifter_res[00],shifter_res[01],shifter_res[02],shifter_res[03],
     shifter_res[04],shifter_res[05],shifter_res[06],shifter_res[07],
     shifter_res[08],shifter_res[09],shifter_res[10],shifter_res[11],
@@ -280,8 +262,10 @@ module e203_exu_alu_dpath(
   wire adder_addsub = adder_add | adder_sub; 
   
 
-     // Make sure to use logic-gating to gateoff the 
+    // Make sure to use logic-gating to gateoff the 
+    // 假设当前的操作不是加法或者减法操作，则使用逻辑门控制加法器的输入以降低动态功耗
   assign adder_in1 = {`E203_ALU_ADDER_WIDTH{adder_addsub}} & (adder_op1);
+    // 使用取反加一的方式将补码减法转换成加法操作
   assign adder_in2 = {`E203_ALU_ADDER_WIDTH{adder_addsub}} & (adder_sub ? (~adder_op2) : adder_op2);
   assign adder_cin = adder_addsub & adder_sub;
 
@@ -526,7 +510,4 @@ module e203_exu_alu_dpath(
   assign muldiv_sbf_1_r = sbf_1_r;
 `endif//E203_SUPPORT_SHARE_MULDIV}
 
-endmodule                                      
-                                               
-                                               
-                                               
+endmodule
